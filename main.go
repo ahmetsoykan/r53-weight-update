@@ -24,31 +24,26 @@ func main() {
 		ids = append(ids, hostedZoneIds[2])
 	}
 	listRecords(svc, ids)
-
 }
 
 func listRecords(svc *route53.Route53, ids []string) {
-	//fmt.Println(ids)
 
 	var wint int64
 	wint = 0
 	for _, zoneid := range ids {
 		zone, _ := svc.ListResourceRecordSets(&route53.ListResourceRecordSetsInput{
 			HostedZoneId: aws.String(zoneid),
+			MaxItems:     aws.String("300"),
 		})
 
 		for id, record := range zone.ResourceRecordSets {
 			if record.Weight != nil {
 				if aws.Int64Value(record.Weight) == wint {
-					//fmt.Println(*record.Name)
-					//fmt.Println(zone.ResourceRecordSets[id])
-					//fmt.Println(*zone.ResourceRecordSets[id].ResourceRecords[0].Value)
-					//fmt.Println(zoneid)
-					//fmt.Println(*zone.ResourceRecordSets[id].SetIdentifier)
-					//fmt.Println(*record.Name)
-					//fmt.Println("----------------------")
-					updateRecord(svc, *record.Name, *zone.ResourceRecordSets[id].ResourceRecords[0].Value, *zone.ResourceRecordSets[id].SetIdentifier, zoneid)
-
+					if strings.Contains(*zone.ResourceRecordSets[id].SetIdentifier, "eks") {
+						fmt.Println(*record.Name)
+						fmt.Println(*zone.ResourceRecordSets[id].ResourceRecords[0].Value)
+						updateRecord(svc, *record.Name, *zone.ResourceRecordSets[id].ResourceRecords[0].Value, *zone.ResourceRecordSets[id].SetIdentifier, zoneid)
+					}
 				}
 			}
 		}
