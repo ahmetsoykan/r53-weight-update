@@ -27,7 +27,6 @@ func main() {
 }
 
 func listRecords(svc *route53.Route53, ids []string) {
-
 	var wint int64
 	wint = 0
 	for _, zoneid := range ids {
@@ -40,8 +39,6 @@ func listRecords(svc *route53.Route53, ids []string) {
 			if record.Weight != nil {
 				if aws.Int64Value(record.Weight) == wint {
 					if strings.Contains(*zone.ResourceRecordSets[id].SetIdentifier, "eks") {
-						fmt.Println(*record.Name)
-						fmt.Println(*zone.ResourceRecordSets[id].ResourceRecords[0].Value)
 						updateRecord(svc, *record.Name, *zone.ResourceRecordSets[id].ResourceRecords[0].Value, *zone.ResourceRecordSets[id].SetIdentifier, zoneid)
 					}
 				}
